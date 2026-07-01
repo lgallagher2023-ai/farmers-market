@@ -10,6 +10,8 @@ import AdminLayout from './components/layout/AdminLayout'
 // Auth
 import Login from './pages/auth/Login'
 import SignUp from './pages/auth/SignUp'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 import VendorSignUp from './pages/vendor/auth/VendorSignUp'
 
 // Customer onboarding
@@ -63,6 +65,8 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/vendor/signup" element={<VendorSignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* ── Vendor onboarding (auth required, but pre-approval) ── */}
               <Route element={<ProtectedRoute role="vendor" />}>
