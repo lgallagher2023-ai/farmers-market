@@ -32,6 +32,8 @@ import Checkout from './pages/customer/Checkout'
 import OrderConfirmation from './pages/customer/OrderConfirmation'
 import OrderTracking from './pages/customer/OrderTracking'
 import Orders from './pages/customer/Orders'
+import Following from './pages/customer/Following'
+import NearMe from './pages/customer/NearMe'
 import Profile from './pages/customer/Profile'
 
 // Vendor screens
@@ -42,6 +44,8 @@ import ProductForm from './pages/vendor/ProductForm'
 import VendorInventory from './pages/vendor/Inventory'
 import VendorSchedule from './pages/vendor/Schedule'
 import VendorPayouts from './pages/vendor/Payouts'
+import VendorProfile from './pages/vendor/Profile'
+import StorefrontCustomizer from './pages/vendor/StorefrontCustomizer'
 
 // Admin screens
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -85,10 +89,10 @@ export default function App() {
                 <Route element={<CustomerLayout />}>
                   <Route path="/" element={<Home />} />
                   <Route path="/search" element={<Search />} />
-                  <Route path="/near-me" element={<Soon label="Near Me" />} />
+                  <Route path="/near-me" element={<NearMe />} />
                   <Route path="/map" element={<Soon label="Map" />} />
                   <Route path="/orders" element={<Orders />} />
-                  <Route path="/following" element={<Soon label="Following" />} />
+                  <Route path="/following" element={<Following />} />
                   <Route path="/profile" element={<Profile />} />
                 </Route>
 
@@ -111,9 +115,9 @@ export default function App() {
                   <Route path="/vendor/products/:productId/edit" element={<ProductForm />} />
                   <Route path="/vendor/inventory" element={<VendorInventory />} />
                   <Route path="/vendor/schedule" element={<VendorSchedule />} />
-                  <Route path="/vendor/storefront" element={<Soon label="Storefront Customization" />} />
+                  <Route path="/vendor/storefront" element={<StorefrontCustomizer />} />
                   <Route path="/vendor/payouts" element={<VendorPayouts />} />
-                  <Route path="/vendor/profile" element={<Soon label="Vendor Profile" />} />
+                  <Route path="/vendor/profile" element={<VendorProfile />} />
                 </Route>
               </Route>
 

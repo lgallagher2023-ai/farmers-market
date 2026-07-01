@@ -10,6 +10,7 @@ const navItems = [
   { to: '/vendor/schedule',  label: 'Schedule',    icon: CalendarIcon },
   { to: '/vendor/storefront',label: 'Storefront',  icon: StoreIcon },
   { to: '/vendor/payouts',   label: 'Payouts',     icon: PayoutsIcon },
+  { to: '/vendor/profile',   label: 'Profile',     icon: ProfileIcon },
 ]
 
 export default function VendorLayout() {
@@ -145,4 +146,7 @@ function StoreIcon({ className }) {
 }
 function PayoutsIcon({ className }) {
   return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+}
+function ProfileIcon({ className }) {
+  return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
 }
