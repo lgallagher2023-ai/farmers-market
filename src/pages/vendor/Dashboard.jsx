@@ -24,8 +24,11 @@ export default function VendorDashboard() {
     if (!vp) { setLoading(false); return }
 
     const now = new Date()
-    const startOfDay = new Date(now.setHours(0, 0, 0, 0)).toISOString()
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())).toISOString()
+    // Use separate Date objects to avoid mutation-based bugs (e.g. setDate shifting
+    // the month when today is the 1st or 2nd and getDay() > getDate())
+    const startOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+    const weekStart    = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay())
+    const startOfWeek  = weekStart.toISOString()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
     const [ordersRes, lowStockRes, appearancesRes] = await Promise.all([
@@ -88,7 +91,7 @@ export default function VendorDashboard() {
           <p className="text-sm text-gray-500 mt-0.5">
             {vendor.status === 'pending'
               ? '⏳ Awaiting admin approval — your storefront is not yet public'
-              : `⭐ ${vendor.average_rating.toFixed(1)} · ${vendor.follower_count} followers`}
+              : `⭐ ${Number(vendor.average_rating ?? 0).toFixed(1)} · ${vendor.follower_count} followers`}
           </p>
         </div>
         <StatusBadge status={vendor.status} />
