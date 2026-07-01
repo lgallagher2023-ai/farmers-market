@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import Button from '../../components/ui/Button'
@@ -8,9 +8,17 @@ import Alert from '../../components/ui/Alert'
 
 export default function SignUp() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { refreshProfile } = useAuth()
+
+  // Pre-fill from guest checkout ("Create account" prompt passes name + email)
+  const prefill = location.state ?? {}
+  const prefillFirst = prefill.prefillName?.split(' ')[0] ?? ''
+  const prefillLast  = prefill.prefillName?.split(' ').slice(1).join(' ') ?? ''
+
   const [form, setForm] = useState({
-    firstName: '', lastName: '', email: '', password: '', confirmPassword: '',
+    firstName: prefillFirst, lastName: prefillLast,
+    email: prefill.prefillEmail ?? '', password: '', confirmPassword: '',
   })
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState('')

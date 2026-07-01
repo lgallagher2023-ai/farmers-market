@@ -6,6 +6,7 @@ import ProtectedRoute from './components/layout/ProtectedRoute'
 import CustomerLayout from './components/layout/CustomerLayout'
 import VendorLayout from './components/layout/VendorLayout'
 import AdminLayout from './components/layout/AdminLayout'
+import MiniCart from './components/cart/MiniCart'
 
 // Auth
 import Login from './pages/auth/Login'
@@ -64,6 +65,13 @@ export default function App() {
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
+            {/*
+              MiniCart lives here — inside CartProvider so it can read cart state,
+              but outside Routes so it appears on every page regardless of layout.
+              It is fixed-position so it renders over any page content.
+            */}
+            <MiniCart />
+
             <Routes>
               {/* ── Public auth ── */}
               <Route path="/login" element={<Login />} />
@@ -96,14 +104,21 @@ export default function App() {
                   <Route path="/profile" element={<Profile />} />
                 </Route>
 
-                {/* Full-screen customer screens (no bottom nav) */}
-                <Route path="/vendors/:vendorId" element={<VendorStorefront />} />
-                <Route path="/products/:productId" element={<ProductPage />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/orders/:orderId/confirmation" element={<OrderConfirmation />} />
+                {/* Authenticated-only full-screen customer screens */}
                 <Route path="/orders/:orderId" element={<OrderTracking />} />
               </Route>
+
+              {/*
+                ── Public browsing + guest checkout ──────────────────────────
+                These routes are accessible to unauthenticated (guest) users so
+                they can browse, add to cart, and complete a purchase without
+                creating an account first. Authenticated customers use them too.
+              */}
+              <Route path="/vendors/:vendorId" element={<VendorStorefront />} />
+              <Route path="/products/:productId" element={<ProductPage />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders/:orderId/confirmation" element={<OrderConfirmation />} />
 
               {/* ── Vendor dashboard (sidebar layout) ── */}
               <Route element={<ProtectedRoute role="vendor" />}>
