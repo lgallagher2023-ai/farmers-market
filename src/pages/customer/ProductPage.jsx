@@ -182,8 +182,11 @@ export default function ProductPage() {
       </button>
 
       {/* Hero photo placeholder */}
-      <div className="h-72 bg-gray-100 flex items-center justify-center text-6xl text-gray-200 -mt-12">
-        📷
+      <div className="h-72 bg-gradient-to-br from-gray-100 to-gray-50 flex flex-col items-center justify-center gap-3 -mt-12">
+        <svg className="h-16 w-16 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <p className="text-sm text-gray-300 font-medium">No photo yet</p>
       </div>
 
       <div className="px-4 mt-4">
@@ -402,8 +405,10 @@ export default function ProductPage() {
                   onClick={() => navigate(`/products/${p.id}`)}
                   className="flex-shrink-0 w-36 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden text-left hover:shadow-md transition-shadow"
                 >
-                  <div className="h-28 bg-gray-100 flex items-center justify-center text-3xl text-gray-200">
-                    📷
+                  <div className="h-28 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+                    <svg className="h-8 w-8 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
                   <div className="p-2.5">
                     <p className="text-sm font-medium text-gray-900 leading-tight line-clamp-2">{p.name}</p>

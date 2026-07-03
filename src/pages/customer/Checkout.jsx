@@ -94,11 +94,19 @@ export default function Checkout() {
           </svg>
         </button>
         <h1 className="text-lg font-bold text-gray-900">Checkout</h1>
-        {isGuest && (
-          <span className="ml-auto text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
-            Guest checkout
+        <div className="ml-auto flex items-center gap-2">
+          {isGuest && (
+            <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
+              Guest
+            </span>
+          )}
+          <span className="flex items-center gap-1 text-xs text-gray-400">
+            <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            Secure
           </span>
-        )}
+        </div>
       </div>
 
       <div className="max-w-md mx-auto px-4 pt-6 space-y-4">
@@ -142,9 +150,12 @@ export default function Checkout() {
         {error && <Alert type="error">{error}</Alert>}
 
         {/* Order summary */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <p className="text-sm font-semibold text-gray-700 mb-3">Order summary</p>
-          <div className="space-y-2 text-sm">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+            <p className="text-sm font-semibold text-gray-700">Order summary</p>
+            <p className="text-sm font-bold text-gray-900">{formatCents(totalCents)}</p>
+          </div>
+          <div className="p-4 space-y-2 text-sm">
             {items.map(i => (
               <div key={i.variantId} className="flex justify-between text-gray-600">
                 <span className="truncate mr-2">
@@ -163,7 +174,7 @@ export default function Checkout() {
                   <span>Discount</span><span>−{formatCents(discountCents)}</span>
                 </div>
               )}
-              <div className="flex justify-between font-bold text-gray-900">
+              <div className="flex justify-between font-bold text-gray-900 pt-1">
                 <span>Total</span><span>{formatCents(totalCents)}</span>
               </div>
             </div>
@@ -382,8 +393,15 @@ function PaymentStep({ contact, totalCents, platformFeeCents, discountCents, cli
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-      <h2 className="font-semibold text-gray-900">Payment</h2>
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+        <svg className="h-3.5 w-3.5 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+        </svg>
+        <h2 className="text-sm font-semibold text-gray-700">Secure payment</h2>
+        <span className="ml-auto text-xs text-gray-400">Powered by Stripe</span>
+      </div>
+      <div className="p-5 space-y-4">
 
       {error && <Alert type="error">{error}</Alert>}
 
@@ -414,6 +432,7 @@ function PaymentStep({ contact, totalCents, platformFeeCents, discountCents, cli
       >
         Confirm & pay {formatCents(totalCents)}
       </Button>
+      </div>
     </form>
   )
 }

@@ -46,15 +46,22 @@ export default function OrderConfirmation() {
       <div className="max-w-sm w-full">
         {/* Success checkmark */}
         <div className="text-center mb-8">
-          <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-            <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+          <div className="relative h-28 w-28 mx-auto mb-5">
+            {/* Outer pulsing halo */}
+            <div className="absolute inset-0 rounded-full bg-brand-100 animate-pulse" />
+            {/* Mid ring */}
+            <div className="absolute inset-3 rounded-full bg-brand-200" />
+            {/* Inner circle */}
+            <div className="absolute inset-6 rounded-full bg-brand-600 flex items-center justify-center shadow-lg">
+              <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Order confirmed!</h1>
-          <p className="text-sm text-gray-500 mt-1">Thank you for supporting local vendors</p>
+          <h1 className="text-2xl font-bold text-gray-900">You're all set! 🎉</h1>
+          <p className="text-sm text-gray-500 mt-1.5">Thank you for supporting local vendors</p>
           <p className="font-mono text-xs text-gray-400 mt-2">
-            #{(order.id ?? orderId).slice(0, 8).toUpperCase()}
+            Order #{(order.id ?? orderId).slice(0, 8).toUpperCase()}
           </p>
         </div>
 

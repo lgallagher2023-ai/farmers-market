@@ -248,7 +248,7 @@ function VendorCard({ vendor, onClick }) {
       className="flex-shrink-0 w-44 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow text-left"
     >
       {/* Banner */}
-      <div className="h-20 bg-gradient-to-r from-brand-100 to-brand-200 relative">
+      <div className="h-20 bg-gradient-to-br from-brand-500 to-brand-700 relative">
         {vendor.banner_url && (
           <img src={vendor.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
         )}

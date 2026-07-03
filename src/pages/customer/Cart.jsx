@@ -49,8 +49,10 @@ export default function Cart() {
             <div className="divide-y divide-gray-50">
               {vendorItems.map(item => (
                 <div key={item.variantId} className="px-4 py-3 flex items-start gap-3">
-                  <div className="h-14 w-14 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-300">
-                    📷
+                  <div className="h-14 w-14 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center">
+                    <svg className="h-6 w-6 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
