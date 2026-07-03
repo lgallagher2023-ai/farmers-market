@@ -123,9 +123,14 @@ export default function CustomerLayout() {
       </header>
 
       {/* Page content — footer lives inside so it scrolls with the page
-           and is never hidden by flex-1 expansion or the fixed bottom nav */}
-      <main className="flex-1">
-        <Outlet />
+           and is never hidden by flex-1 expansion or the fixed bottom nav.
+           main is a flex column so the content area grows to fill the
+           viewport and pushes the footer to the bottom instead of it
+           floating right after short page content. */}
+      <main className="flex-1 flex flex-col">
+        <div className="flex-1">
+          <Outlet />
+        </div>
         <footer className="bg-white border-t border-gray-100 px-4 py-4 pb-20 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
           <Link to="/terms" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
             Terms of Service
