@@ -10,7 +10,7 @@ export default function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const track = useTrackBehavior()
-  const [vendors, setVendors] = useState([])
+  const [rows, setRows] = useState([])
   const [recentOrders, setRecentOrders] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -20,24 +20,133 @@ export default function Home() {
   }, [])
 
   async function loadHome() {
-    const [vendorRes, orderRes] = await Promise.all([
+    const today = new Date()
+
+    // ── This weekend's dates ──────────────────────────────────────────────────
+    const weekendDates = getWeekendDates(today)
+
+    // ── New this week = joined in the last 7 days ─────────────────────────────
+    const weekAgo = new Date(today)
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    const weekAgoStr = weekAgo.toISOString()
+
+    const [vendorRes, categoryRes, appearanceRes, orderRes] = await Promise.all([
+      // All active vendors — we slice/filter client-side per row
       supabase
         .from('vendor_profiles')
-        .select('id, business_name, business_description, logo_url, banner_url, average_rating, follower_count, badges')
+        .select('id, business_name, business_description, logo_url, banner_url, average_rating, follower_count, badges, created_at, business_type')
         .eq('status', 'active')
-        .order('follower_count', { ascending: false })
-        .limit(20),
+        .limit(200),
 
-      user ? supabase
-        .from('orders')
-        .select('id, created_at, status, total_cents, order_items(product_name_snapshot)')
-        .eq('customer_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(3)
+      // Vendor-type categories (for labelling rows by business type)
+      supabase
+        .from('categories')
+        .select('id, name')
+        .eq('category_type', 'vendor_type')
+        .eq('status', 'active'),
+
+      // Market appearances this weekend (non-cancelled)
+      weekendDates.length > 0
+        ? supabase
+            .from('market_appearances')
+            .select('vendor_id')
+            .in('appearance_date', weekendDates)
+            .neq('status', 'cancelled')
+        : Promise.resolve({ data: [] }),
+
+      // Recent orders for "Order again" strip
+      user
+        ? supabase
+            .from('orders')
+            .select('id, created_at, status, total_cents, order_items(product_name_snapshot)')
+            .eq('customer_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(3)
         : Promise.resolve({ data: [] }),
     ])
 
-    setVendors(vendorRes.data ?? [])
+    const allVendors = vendorRes.data ?? []
+
+    // Build a lookup: category UUID → display name
+    const catMap = Object.fromEntries(
+      (categoryRes.data ?? []).map(c => [c.id, c.name])
+    )
+
+    // Annotate vendors with their category name
+    const vendors = allVendors.map(v => ({
+      ...v,
+      categoryName: catMap[v.business_type] ?? null,
+    }))
+
+    // Set of vendor IDs appearing this weekend
+    const weekendVendorIds = new Set(
+      (appearanceRes.data ?? []).map(a => a.vendor_id)
+    )
+
+    // ── Build rows ────────────────────────────────────────────────────────────
+
+    const builtRows = []
+
+    // 1. At markets this weekend
+    const weekendVendors = vendors
+      .filter(v => weekendVendorIds.has(v.id))
+      .slice(0, 12)
+    if (weekendVendors.length > 0) {
+      builtRows.push({
+        label: weekendRowLabel(today),
+        vendors: weekendVendors,
+      })
+    }
+
+    // 2. New vendors this week
+    const newVendors = vendors
+      .filter(v => v.created_at >= weekAgoStr)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 12)
+    if (newVendors.length > 0) {
+      builtRows.push({ label: 'New This Week', vendors: newVendors })
+    }
+
+    // 3. One row per vendor-type category, sorted by vendor count (largest first)
+    //    Within each row: vendors ordered by average_rating desc
+    const categoryGroups = {}
+    vendors.forEach(v => {
+      if (!v.categoryName) return
+      if (!categoryGroups[v.categoryName]) categoryGroups[v.categoryName] = []
+      categoryGroups[v.categoryName].push(v)
+    })
+
+    Object.entries(categoryGroups)
+      .sort(([, a], [, b]) => b.length - a.length)
+      .slice(0, 4)                                 // up to 4 category rows
+      .forEach(([catName, catVendors]) => {
+        const sorted = [...catVendors]
+          .sort((a, b) => (b.average_rating ?? 0) - (a.average_rating ?? 0))
+          .slice(0, 12)
+        builtRows.push({
+          label: `Top ${catName} Vendors`,
+          vendors: sorted,
+        })
+      })
+
+    // 4. Highest rated (quality signal; shows regardless of category)
+    const topRated = vendors
+      .filter(v => (v.average_rating ?? 0) >= 4.0)
+      .sort((a, b) => (b.average_rating ?? 0) - (a.average_rating ?? 0))
+      .slice(0, 12)
+    if (topRated.length > 0) {
+      builtRows.push({ label: 'Highest Rated', vendors: topRated })
+    }
+
+    // 5. Fallback: most-followed vendors (always visible if any vendors exist)
+    if (builtRows.length === 0 && vendors.length > 0) {
+      const popular = [...vendors]
+        .sort((a, b) => (b.follower_count ?? 0) - (a.follower_count ?? 0))
+        .slice(0, 12)
+      builtRows.push({ label: 'Popular Vendors', vendors: popular })
+    }
+
+    setRows(builtRows)
     setRecentOrders(orderRes.data ?? [])
     setLoading(false)
   }
@@ -50,7 +159,7 @@ export default function Home() {
   if (loading) return <PageLoader />
 
   return (
-    <div className="pb-6">
+    <div className="pb-8">
       {/* Hero / greeting */}
       <div className="bg-gradient-to-br from-brand-600 to-brand-700 px-4 py-8 text-white">
         <p className="text-sm font-medium opacity-80 mb-1">Good {greeting()} 👋</p>
@@ -71,12 +180,12 @@ export default function Home() {
 
       {/* Order Again */}
       {recentOrders.length > 0 && (
-        <section className="px-4 pt-6">
-          <div className="flex items-center justify-between mb-3">
+        <section className="pt-6">
+          <div className="flex items-center justify-between mb-3 px-4">
             <h2 className="font-semibold text-gray-900">Order again</h2>
             <button onClick={() => navigate('/orders')} className="text-xs text-brand-600 hover:underline">See all</button>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+          <div className="flex gap-3 overflow-x-auto pb-2 px-4">
             {recentOrders.map(order => (
               <button
                 key={order.id}
@@ -94,77 +203,135 @@ export default function Home() {
         </section>
       )}
 
-      {/* Vendor rows */}
-      <section className="px-4 pt-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-gray-900">Popular vendors</h2>
-          <button onClick={() => navigate('/browse')} className="text-xs text-brand-600 hover:underline">See all</button>
-        </div>
-        {vendors.length === 0 ? (
+      {/* Dynamic vendor rows */}
+      {rows.length === 0 ? (
+        <div className="px-4 pt-6">
           <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
             <p className="text-4xl mb-3">🌿</p>
             <p className="text-gray-500 text-sm">No vendors yet — check back soon!</p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {vendors.map(vendor => (
-              <VendorCard key={vendor.id} vendor={vendor} onClick={() => handleVendorClick(vendor.id)} />
-            ))}
-          </div>
-        )}
-      </section>
+        </div>
+      ) : (
+        rows.map(row => (
+          <section key={row.label} className="pt-6">
+            <div className="flex items-center justify-between mb-3 px-4">
+              <h2 className="font-semibold text-gray-900">{row.label}</h2>
+              <button
+                onClick={() => navigate('/search')}
+                className="text-xs text-brand-600 hover:underline"
+              >
+                See all
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 px-4">
+              {row.vendors.map(vendor => (
+                <VendorCard
+                  key={vendor.id}
+                  vendor={vendor}
+                  onClick={() => handleVendorClick(vendor.id)}
+                />
+              ))}
+            </div>
+          </section>
+        ))
+      )}
     </div>
   )
 }
+
+// ── Compact horizontal-scroll vendor card ────────────────────────────────────
 
 function VendorCard({ vendor, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow text-left w-full"
+      className="flex-shrink-0 w-44 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow text-left"
     >
       {/* Banner */}
-      <div className="h-24 bg-gradient-to-r from-brand-100 to-brand-200 relative">
+      <div className="h-20 bg-gradient-to-r from-brand-100 to-brand-200 relative">
         {vendor.banner_url && (
           <img src={vendor.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
         )}
-        {/* Logo */}
-        <div className="absolute -bottom-4 left-4 h-10 w-10 rounded-full bg-white border-2 border-white shadow flex items-center justify-center text-lg">
+        {/* Logo badge */}
+        <div className="absolute -bottom-3 left-3 h-8 w-8 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-sm">
           {vendor.logo_url
             ? <img src={vendor.logo_url} alt="" className="h-full w-full rounded-full object-cover" />
             : '🌿'}
         </div>
       </div>
-      <div className="px-4 pt-6 pb-4">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="font-semibold text-gray-900">{vendor.business_name}</p>
-            {vendor.business_description && (
-              <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{vendor.business_description}</p>
-            )}
-          </div>
-          <div className="text-right flex-shrink-0">
-            {vendor.average_rating > 0 && (
-              <p className="text-sm font-medium text-gray-700">⭐ {vendor.average_rating.toFixed(1)}</p>
-            )}
-            <p className="text-xs text-gray-400">{vendor.follower_count} followers</p>
-          </div>
+
+      <div className="px-3 pt-5 pb-3">
+        <p className="text-sm font-semibold text-gray-900 leading-tight truncate">
+          {vendor.business_name}
+        </p>
+
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+          {(vendor.average_rating ?? 0) > 0 && (
+            <span className="text-xs text-gray-500">
+              ⭐ {Number(vendor.average_rating).toFixed(1)}
+            </span>
+          )}
+          {vendor.categoryName && (
+            <span className="text-xs text-brand-600 truncate">{vendor.categoryName}</span>
+          )}
         </div>
+
         {vendor.badges?.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-3">
-            {vendor.badges.slice(0, 3).map(badge => (
-              <span key={badge} className="text-xs bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full">{badge}</span>
-            ))}
-          </div>
+          <span className="inline-block mt-1.5 text-xs bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full truncate max-w-full">
+            {vendor.badges[0]}
+          </span>
         )}
       </div>
     </button>
   )
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
 function greeting() {
   const h = new Date().getHours()
   if (h < 12) return 'morning'
   if (h < 17) return 'afternoon'
   return 'evening'
+}
+
+/**
+ * Returns the ISO date strings for this weekend (upcoming Sat + Sun).
+ * If today is Saturday: [today, tomorrow].
+ * If today is Sunday:   [today] (weekend is ending).
+ * Otherwise:            [next Saturday, next Sunday].
+ */
+function getWeekendDates(today = new Date()) {
+  const d = today.getDay() // 0=Sun … 6=Sat
+  if (d === 6) {
+    // Saturday
+    const sat = today.toISOString().split('T')[0]
+    const sun = new Date(today)
+    sun.setDate(today.getDate() + 1)
+    return [sat, sun.toISOString().split('T')[0]]
+  }
+  if (d === 0) {
+    // Sunday (end of weekend)
+    return [today.toISOString().split('T')[0]]
+  }
+  // Mon–Fri: look ahead to Saturday and Sunday
+  const daysToSat = 6 - d
+  const sat = new Date(today)
+  sat.setDate(today.getDate() + daysToSat)
+  const sun = new Date(sat)
+  sun.setDate(sat.getDate() + 1)
+  return [sat.toISOString().split('T')[0], sun.toISOString().split('T')[0]]
+}
+
+/**
+ * Returns the weekend section label based on what day it is.
+ */
+function weekendRowLabel(today = new Date()) {
+  const d = today.getDay()
+  if (d === 6) return 'At Markets Today'
+  if (d === 0) return 'At Markets Today'
+  // How many days until Saturday?
+  const daysToSat = 6 - d
+  if (daysToSat === 1) return 'At Markets Tomorrow'
+  return 'Vendors at Markets This Weekend'
 }
