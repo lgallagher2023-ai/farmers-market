@@ -127,6 +127,21 @@ export default function CustomerLayout() {
         <Outlet />
       </main>
 
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-100 px-4 py-4 pb-24 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+        <Link to="/terms" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          Terms of Service
+        </Link>
+        <span className="text-gray-200 text-xs">·</span>
+        <Link to="/privacy" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          Privacy Policy
+        </Link>
+        <span className="text-gray-200 text-xs">·</span>
+        <a href="mailto:support@marketplatform.com" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          Contact us
+        </a>
+      </footer>
+
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 flex">
         {navItems.map(({ to, label, icon: Icon }) => (

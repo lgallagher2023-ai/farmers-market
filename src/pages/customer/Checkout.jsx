@@ -417,9 +417,9 @@ function PaymentStep({ contact, totalCents, platformFeeCents, discountCents, cli
         />
         <span>
           I agree to the{' '}
-          <a href="#" className="text-brand-600 hover:underline">Terms of Service</a>,{' '}
-          <a href="#" className="text-brand-600 hover:underline">Cancellation Policy</a>, and{' '}
-          <a href="#" className="text-brand-600 hover:underline">Refund Policy</a>.
+          <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">Terms of Service</a>,{' '}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">Privacy Policy</a>, and{' '}
+          <a href="/terms#cancellation" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">Cancellation Policy</a>.
         </span>
       </label>
 

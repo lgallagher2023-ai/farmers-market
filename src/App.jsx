@@ -48,6 +48,10 @@ import VendorPayouts from './pages/vendor/Payouts'
 import VendorProfile from './pages/vendor/Profile'
 import StorefrontCustomizer from './pages/vendor/StorefrontCustomizer'
 
+// Legal screens
+import TermsOfService from './pages/legal/TermsOfService'
+import PrivacyPolicy from './pages/legal/PrivacyPolicy'
+
 // Admin screens
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminMarkets from './pages/admin/Markets'
@@ -119,6 +123,8 @@ export default function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/orders/:orderId/confirmation" element={<OrderConfirmation />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
 
               {/* ── Vendor dashboard (sidebar layout) ── */}
               <Route element={<ProtectedRoute role="vendor" />}>
