@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
@@ -21,7 +21,7 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <span className="font-bold text-brand-700 text-lg">🌿 Admin</span>
+          <Link to="/admin" className="font-bold text-brand-700 text-lg hover:opacity-75 transition-opacity">🌿 Admin</Link>
           <nav className="flex gap-1">
             {navItems.map(({ to, label, end }) => (
               <NavLink

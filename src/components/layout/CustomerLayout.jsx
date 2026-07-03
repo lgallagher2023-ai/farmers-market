@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { useAuth } from '../../context/AuthContext'
 
@@ -58,7 +58,7 @@ export default function CustomerLayout() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top bar */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-        <span className="font-bold text-brand-700 text-lg">🌿 Market</span>
+        <Link to="/" className="font-bold text-brand-700 text-lg hover:opacity-75 transition-opacity">🌿 Market</Link>
 
         <div className="flex items-center gap-3">
           {/* Cart */}

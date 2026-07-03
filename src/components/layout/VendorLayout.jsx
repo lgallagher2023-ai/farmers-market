@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useState } from 'react'
 
@@ -28,7 +28,7 @@ export default function VendorLayout() {
       {/* Sidebar — desktop */}
       <aside className="hidden md:flex flex-col w-60 bg-white border-r border-gray-100 fixed inset-y-0">
         <div className="px-6 py-5 border-b border-gray-100">
-          <span className="font-bold text-brand-700 text-lg">🌿 Market</span>
+          <Link to="/vendor/dashboard" className="font-bold text-brand-700 text-lg hover:opacity-75 transition-opacity">🌿 Market</Link>
           <p className="text-xs text-gray-500 mt-0.5">Vendor Portal</p>
         </div>
         <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
@@ -67,7 +67,7 @@ export default function VendorLayout() {
 
       {/* Mobile header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-        <span className="font-bold text-brand-700 text-lg">🌿 Market</span>
+        <Link to="/vendor/dashboard" className="font-bold text-brand-700 text-lg hover:opacity-75 transition-opacity">🌿 Market</Link>
         <button onClick={() => setSidebarOpen(true)} className="p-2 text-gray-600">
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -81,7 +81,7 @@ export default function VendorLayout() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
           <aside className="relative bg-white w-72 flex flex-col">
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-              <span className="font-bold text-brand-700 text-lg">🌿 Market</span>
+              <Link to="/vendor/dashboard" onClick={() => setSidebarOpen(false)} className="font-bold text-brand-700 text-lg hover:opacity-75 transition-opacity">🌿 Market</Link>
               <button onClick={() => setSidebarOpen(false)} className="text-gray-400">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
